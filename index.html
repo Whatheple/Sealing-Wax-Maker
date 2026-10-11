@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sealing Wax Maker v19 - Contained Stamp</title>
+<style>
+:root{--bg:#111014;--panel:#1e1a20;--panel2:#272228;--line:#3b343d;--text:#f5eef2;--muted:#aaa0aa;--accent:#aa5f7d}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;color:var(--text);background:radial-gradient(circle at 20% 0,#30242c 0,#171519 42%,#0d0c0f 100%);font:13px/1.4 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;overflow:hidden}
+button,input,select{font:inherit}button{cursor:pointer}.app{height:100vh;display:grid;grid-template-columns:540px minmax(0,1fr);grid-template-rows:56px 1fr}header{grid-column:1/3;display:flex;align-items:center;justify-content:space-between;padding:0 15px;background:#161317ee;border-bottom:1px solid var(--line)}.brand{display:flex;gap:9px;align-items:center;font-weight:800}.dot{width:25px;height:25px;border-radius:50%;background:radial-gradient(circle at 31% 21%,#f3cedb,#9f4f6b 44%,#411725);box-shadow:inset -4px -4px 7px #0007,0 3px 12px #0008}.ver{color:var(--muted);font-size:10px}.actions{display:flex;gap:6px}.btn{border:1px solid var(--line);background:#29252b;color:var(--text);padding:7px 10px;border-radius:8px}.btn.primary{background:#82475f;border-color:#ae6583}.btn:disabled{opacity:.45;cursor:not-allowed}
+aside{overflow:auto;padding:10px;border-right:1px solid var(--line);background:#19171bee;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:8px}.section{padding:9px 10px;margin:0;border:1px solid var(--line);border-radius:11px;background:linear-gradient(180deg,#252127,#201c21)}.section.wide{grid-column:1/-1}.section.wide + .section{ }h3{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}.hint,.small{font-size:10px;color:var(--muted)}.select,.num{background:#171519;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:6px}.select{width:100%}.field{display:grid;grid-template-columns:minmax(0,1fr) 58px;gap:7px;align-items:center;margin:7px 0}.num{width:58px;text-align:right;font:10px ui-monospace,SFMono-Regular,Consolas,monospace}label{font-size:10px;color:#ded6dc}.check{display:flex;gap:7px;align-items:flex-start;margin:7px 0}.check input{margin-top:2px;accent-color:#b76f8a}.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.seg.two{grid-template-columns:repeat(2,1fr)}.seg button{border:1px solid var(--line);background:#181619;color:#d0c7cf;padding:6px 4px;border-radius:7px;font-size:10px}.seg button.active{background:#664154;border-color:#9c627b;color:#fff}.palette{display:flex;flex-direction:column;gap:5px}.swatch{display:grid;grid-template-columns:30px 1fr auto;gap:6px;align-items:center}.swatch input[type=color]{width:30px;height:24px;padding:0;border:1px solid #665e67;border-radius:6px;background:none}.hex{font:10px ui-monospace,SFMono-Regular,Consolas,monospace;color:#ddd3dc}.mini{padding:5px 7px;font-size:10px;border-radius:6px}.row{display:flex;gap:6px;align-items:center}.progress{height:4px;border-radius:4px;background:#2b262c;overflow:hidden;margin-top:7px}.progress i{display:block;width:0;height:100%;background:#9f5572}.warn{color:#efb5c5}
+main{padding:12px;display:grid;grid-template-rows:minmax(0,1fr);gap:9px;min-width:0;min-height:0}.workspace{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;overflow:hidden;border:1px solid var(--line);border-radius:15px;background-color:#171519;background-image:linear-gradient(45deg,#211e22 25%,transparent 25%),linear-gradient(-45deg,#211e22 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#211e22 75%),linear-gradient(-45deg,transparent 75%,#211e22 75%);background-size:26px 26px;background-position:0 0,0 13px,13px -13px,-13px 0}.workspace.solid{background:#252128}.workspace canvas{display:block;max-width:calc(100% - 30px);max-height:calc(100% - 30px);object-fit:contain;filter:drop-shadow(0 16px 22px #0009)}.empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:#817680;padding:30px}.hidden{display:none!important}.footer{display:flex;align-items:center;justify-content:space-between;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:#19171b}.status{min-width:0;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;font-size:11px}.status b{color:#eee}.status span{color:#aaa1ab}.kbd{border:1px solid #4a434c;border-bottom-width:2px;border-radius:5px;padding:1px 4px;font-size:9px;color:#c9c0c8}
+@media(max-width:980px){body{overflow:auto}.app{height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:56px auto auto}header{grid-column:1}.workspace{height:60vh}aside{grid-template-columns:repeat(2,minmax(0,1fr));border-right:0;border-bottom:1px solid var(--line)}main{min-height:70vh}}@media(max-width:620px){aside{grid-template-columns:1fr}.section.wide{grid-column:auto}}
+
+.tut-dim{position:fixed;inset:0;z-index:1000;background:rgba(8,6,10,.72)}.tut-hl{position:relative;z-index:1001;border-radius:11px;box-shadow:0 0 0 3px var(--accent),0 0 0 9999px rgba(8,6,10,0)!important;outline:2px solid #f0b6cb;outline-offset:2px}
+.tut-card{position:fixed;z-index:1002;left:50%;bottom:28px;transform:translateX(-50%);width:min(420px,calc(100vw - 32px));padding:15px 16px;border:1px solid var(--accent);border-radius:14px;background:#231e25;box-shadow:0 10px 40px #000a}.tut-card h4{margin:0 0 5px;font-size:15px}.tut-card p{margin:0 0 12px;color:#d9ced6;font-size:13px;line-height:1.55}.tut-card .tut-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}.tut-card .tut-step{color:var(--muted);font-size:11px}
+
+.fbtns{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}.fb{border:1px solid var(--line);background:transparent;color:var(--muted);width:19px;height:17px;padding:0;border-radius:5px;font-size:11px;line-height:1}.fb:hover:not(:disabled){color:var(--text);border-color:var(--accent)}.fb:disabled{opacity:.3;cursor:default}
+.dlg-card{position:fixed;z-index:1002;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100vw - 32px));padding:16px;border:1px solid var(--accent);border-radius:14px;background:var(--panel2);box-shadow:0 10px 40px #000a}.dlg-card h4{margin:0 0 8px;font-size:15px}.dlg-card input{width:100%;margin:4px 0 4px}.dlg-card .hint{margin-bottom:12px}.dlg-card .dlg-foot{display:flex;justify-content:flex-end;gap:6px}
+html[data-theme=light]{--bg:#f4f0f3;--panel:#ffffff;--panel2:#fbf8fa;--line:#d9cfd6;--text:#2a2228;--muted:#74697a;--accent:#b56a88}
+html[data-theme=light] body{background:linear-gradient(180deg,#f7f3f6,#ece6ea)}
+html[data-theme=light] header{background:#fffffff0}html[data-theme=light] aside{background:#f7f3f6ee}
+html[data-theme=light] .section{background:linear-gradient(180deg,#ffffff,#faf6f9)}
+html[data-theme=light] .btn{background:#fff;color:var(--text)}html[data-theme=light] .btn.primary{background:#a0587a;border-color:#8c4767;color:#fff}
+html[data-theme=light] .select,html[data-theme=light] .num{background:#fff;color:var(--text)}
+html[data-theme=light] label{color:#4a4048}
+html[data-theme=light] .seg button{background:#f3eef2;color:#4a4048}html[data-theme=light] .seg button.active{background:#a0587a;border-color:#8c4767;color:#fff}
+html[data-theme=light] .hex{color:#4a4048}html[data-theme=light] .swatch input[type=color]{border-color:#c9bec6}
+html[data-theme=light] .progress{background:#e4dce2}
+html[data-theme=light] .warn{color:#b0345a}
+html[data-theme=light] .workspace{background-color:#f1edf0;background-image:linear-gradient(45deg,#e4dee3 25%,transparent 25%),linear-gradient(-45deg,#e4dee3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e4dee3 75%),linear-gradient(-45deg,transparent 75%,#e4dee3 75%)}
+html[data-theme=light] .workspace.solid{background:#ffffff}
+html[data-theme=light] .workspace canvas{filter:drop-shadow(0 12px 18px #0003)}
+html[data-theme=light] .empty{color:#8a7f88}
+html[data-theme=light] .status b{color:#1d171b}html[data-theme=light] .status span{color:#74697a}
+html[data-theme=light] .tut-card,html[data-theme=light] .dlg-card{background:#fff}html[data-theme=light] .tut-card p{color:#4a4048}
+html[data-theme=light] .tut-hl{outline-color:#b56a88}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand"><span class="dot"></span><span>Sealing Wax Maker</span></div><div class="actions"><label style="display:flex;align-items:center;gap:4px" title="저장 해상도 (정사각형, 64~4096)"><span class="small">저장</span><input id="output" class="num" type="number" min="64" max="4096" step="1" value="1200" style="width:70px"><span class="small">px</span></label><button id="theme" class="btn" title="다크 / 화이트 모드 전환">🌙</button><button id="help" class="btn" title="사용법 다시 보기">?</button><button id="reset" class="btn" title="모든 설정(슬라이더·모양·색상·모드)을 기본값으로 되돌립니다. 불러온 이미지는 유지됩니다.">초기화</button><button id="save" class="btn primary">PNG 저장</button></div></header>
+<aside>
+<div class="section wide"><h3>Image</h3><input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="width:100%"><div class="hint" style="margin-top:6px">투명 PNG는 투명한 바깥 영역을 유지합니다. 배경 제거는 켰을 때만 적용되며, 그림 가장자리와 이어진 배경색만 지웁니다.</div><label class="check"><input id="removeWhite" type="checkbox"><span>배경을 투명하게 처리 (가장자리 색 자동 감지)</span></label><div id="whiteArea" class="field hidden"><label>배경 제거 허용치</label><input id="whiteThreshold" type="range" min="2" max="120" value="30"><input id="whiteThresholdNum" class="num" type="number" min="2" max="120" value="30"></div></div>
+<div class="section"><h3>Wax shape</h3><label>모양</label><select id="shape" class="select"><option value="circle">원형</option><option value="ellipse">타원</option><option value="rounded">둥근 사각형</option><option value="square">정사각형</option><option value="rect">직사각형</option><option value="hex">육각형</option><option value="blob">그림에 맞춤</option></select>
+<div class="field"><label>크기</label><input id="size" type="range" min="80" max="125" value="100"><input id="sizeNum" class="num" type="number" min="80" max="125" value="100"></div>
+<div id="rectField" class="hidden"><div class="field"><label>가로</label><input id="rectW" type="range" min="30" max="125" value="100"><input id="rectWNum" class="num" type="number" min="30" max="125" value="100"></div><div class="field"><label>세로</label><input id="rectH" type="range" min="30" max="125" value="70"><input id="rectHNum" class="num" type="number" min="30" max="125" value="70"></div></div>
+<div class="field"><label>눌려 퍼짐</label><input id="spread" type="range" min="0" max="100" value="50"><input id="spreadNum" class="num" type="number" min="0" max="100" value="50"></div>
+<div class="field"><label>외곽 울렁임</label><input id="roughEdge" type="range" min="0" max="200" value="70"><input id="roughEdgeNum" class="num" type="number" min="0" max="200" value="70"></div>
+<div class="field"><label>방울 (0 = 없음, 100 = 5개 전후)</label><input id="droplets" type="range" min="0" max="100" value="0"><input id="dropletsNum" class="num" type="number" min="0" max="100" value="0"></div>
+<div class="field"><label>압인 크기</label><input id="pressScale" type="range" min="72" max="92" value="86"><input id="pressScaleNum" class="num" type="number" min="72" max="92" value="86"></div>
+<div class="field"><label>회전</label><input id="rotation" type="range" min="-180" max="180" value="0"><input id="rotationNum" class="num" type="number" min="-180" max="180" value="0"></div>
+<div class="hint">선택한 <b>모양이 왁스 전체 외곽</b>을 결정합니다. 그림은 중앙 압인 면 안에 자동으로 맞춰집니다. 눌려 퍼짐은 스탬프 압력으로 밀려난 바깥 립의 폭을 바꿉니다. 외곽은 녹은 왁스가 눌린 듯 불규칙하게 남습니다.</div></div>
+<div class="section"><h3>Stamp / line art</h3><div class="seg two" id="mode"><button data-v="line" class="active">선화</button><button data-v="tone">흑백 명암</button></div>
+<div class="field"><label>선화 기준</label><input id="lineThreshold" type="range" min="60" max="245" value="190"><input id="lineThresholdNum" class="num" type="number" min="60" max="245" value="190"></div>
+<div class="field"><label>선화 보존</label><input id="linePreserve" type="range" min="0" max="100" value="96"><input id="linePreserveNum" class="num" type="number" min="0" max="100" value="96"></div>
+<div class="field"><label>압인 깊이</label><input id="engrave" type="range" min="10" max="100" value="85"><input id="engraveNum" class="num" type="number" min="10" max="100" value="85"></div>
+<div class="field"><label>압인 선명도</label><input id="contrast" type="range" min="0" max="100" value="92"><input id="contrastNum" class="num" type="number" min="0" max="100" value="92"></div>
+<div class="field"><label>그림 채움 (압인 안)</label><input id="artFill" type="range" min="30" max="200" value="90"><input id="artFillNum" class="num" type="number" min="30" max="200" value="90"></div>
+<div class="hint">컬러 원본도 흑백 정보로 바꿔 읽고, 선을 왁스에 <b>음각</b>으로 눌러 넣습니다.</div></div>
+<div class="section"><h3>Wax colors</h3><div id="palette" class="palette"></div><div class="row" style="margin-top:7px"><button id="addColor" class="btn mini">+ 색상</button><button id="randomPalette" class="btn mini">🎨 랜덤</button></div>
+<label style="display:block;margin-top:8px">혼합 방식</label><select id="blend" class="select"><option value="solid">단색</option><option value="gradient">부드러운 혼합</option><option value="marble" selected>마블링</option><option value="ribbon">결 무늬</option><option value="mottle">얼룩</option></select>
+<div class="field"><label>무늬 크기</label><input id="patternScale" type="range" min="14" max="180" value="68"><input id="patternScaleNum" class="num" type="number" min="14" max="180" value="68"></div>
+<div class="field"><label>혼합 강도</label><input id="patternStrength" type="range" min="0" max="100" value="78"><input id="patternStrengthNum" class="num" type="number" min="0" max="100" value="78"></div>
+<div id="twistField" class="field hidden"><label>결 비틀기 (결 무늬)</label><input id="ribbonTwist" type="range" min="0" max="300" value="100"><input id="ribbonTwistNum" class="num" type="number" min="0" max="300" value="100"></div></div>
+<div class="section"><h3>Surface</h3><div class="field"><label>입체감</label><input id="depth" type="range" min="20" max="200" value="96"><input id="depthNum" class="num" type="number" min="20" max="200" value="96"></div><div class="field"><label>광택</label><input id="gloss" type="range" min="0" max="100" value="54"><input id="glossNum" class="num" type="number" min="0" max="100" value="54"></div><div class="field"><label>표면 거칠기</label><input id="rough" type="range" min="0" max="100" value="20"><input id="roughNum" class="num" type="number" min="0" max="100" value="20"></div><label class="check"><input id="checker" type="checkbox" checked><span>미리보기 투명 격자</span></label></div>
+<div class="section wide"><div id="bar" class="progress" style="margin-top:0"><i id="progress"></i></div><div id="status" class="status" style="margin-top:8px">대기 중 · <span>브라우저 안에서 처리됩니다.</span></div><div id="sizeText" class="small" style="margin-top:3px">미리보기 없음</div></div>
+</aside>
+<main><div id="workspace" class="workspace"><div id="empty" class="empty">이미지를 넣으면 여기에 실링 왁스가 만들어집니다.<br><span class="small">도톰한 왁스 덩어리 + 중앙 압인면 + 눌려 퍼진 바깥 립</span></div><canvas id="canvas" class="hidden"></canvas></div></main>
+</div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const defaults={size:100,spread:50,roughEdge:70,droplets:0,pressScale:86,rotation:0,whiteThreshold:30,lineThreshold:190,linePreserve:96,engrave:85,contrast:92,artFill:90,rectW:100,rectH:70,ribbonTwist:100,patternScale:68,patternStrength:78,depth:96,gloss:54,rough:20,output:1200};
+const state={image:null,source:null,sourceData:null,seed:12931,shapeSeed:4177,dropSeed:7351,mode:'line',colors:['#761d39','#a83456','#d57b63'],renderTimer:0,token:0,maskCache:{alphaKey:'',designKey:'',alpha:null,design:null,box:null}};
+const safeNum=(id,fallback)=>{const e=$(id);const n=e?Number(e.value):NaN;return Number.isFinite(n)?n:fallback};
+const checked=id=>!!($(id)&&$(id).checked);
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const smooth=t=>{t=clamp(t);return t*t*(3-2*t)};
+const mix=(a,b,t)=>({r:a.r+(b.r-a.r)*t,g:a.g+(b.g-a.g)*t,b:a.b+(b.b-a.b)*t});
+function rgb(hex){const n=parseInt(String(hex).replace('#',''),16);return{r:(n>>16)&255,g:(n>>8)&255,b:n&255}}
+function hslHex(h,s,l){s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return '#'+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('')}
+function hash(x,y){const v=Math.sin(x*127.1+y*311.7+state.seed*0.017)*43758.5453123;return v-Math.floor(v)}
+// Smooth, isotropic outline-warp field (sum of tilted plane waves). Replaces the lattice value-noise for the silhouette, which made outlines boxy.
+function makeWarp(seed,minSide){const F=[];for(let k=0;k<2;k++){let rs=(((seed>>>0)^(k?0x85EBCA6B:0x27D4EB2F))>>>0)||1;const rnd=()=>{rs=(rs+0x6D2B79F5)>>>0;let t=rs;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296};
+  const W=[[.52,1.15,1],[.40,.80,.8],[.28,.50,.55],[.20,.34,.4]].map(([a,b,amp])=>{const th=rnd()*6.2832,lam=minSide*(a+(b-a)*rnd()),kk=6.2832/lam;return{kx:Math.cos(th)*kk,ky:Math.sin(th)*kk,ph:rnd()*6.2832,amp:amp*.15}});F.push(W)}
+  return (x,y,k)=>{const W=F[k];let v=0;for(let i=0;i<4;i++){const q=W[i];v+=q.amp*Math.sin(q.kx*x+q.ky*y+q.ph)}return v}}
+function noise(x,y,s){s=Math.max(8,s);const gx=Math.floor(x/s),gy=Math.floor(y/s),fx=x/s-gx,fy=y/s-gy,a=hash(gx,gy),b=hash(gx+1,gy),c=hash(gx,gy+1),d=hash(gx+1,gy+1);return (a+(b-a)*smooth(fx))+(c+(d-c)*smooth(fx)-(a+(b-a)*smooth(fx)))*smooth(fy)}
+function paletteAt(t){if(state.colors.length===1)return rgb(state.colors[0]);const f=clamp(t)*(state.colors.length-1),i=Math.min(state.colors.length-2,Math.floor(f));return mix(rgb(state.colors[i]),rgb(state.colors[i+1]),smooth(f-i))}
+// Wax colour pattern. n2 = value noise in "lattice units" so every mode can use its own feature size / stretch.
+function makePattern(w,h){
+  const mode=$('blend')?.value||'marble',s=Math.max(8,safeNum('patternScale',68)),st=safeNum('patternStrength',78)/100;
+  const n2=(a,b)=>noise(a*16,b*16,16);
+  const fbm=(a,b)=>(.5*n2(a,b)+.25*n2(a*2.03+5.2,b*2.03+1.3)+.125*n2(a*4.1+9.1,b*4.1+2.7)+.0625*n2(a*8.3+3.7,b*8.3+6.1))/.9375;
+  if(mode==='solid')return()=>.5;
+  if(mode==='gradient')return x=>clamp(x/Math.max(1,w-1));
+  if(mode==='ribbon'){
+    // 결 무늬: long thin parallel fibres that undulate gently (wood-grain / brushed look)
+    // tw (결 비틀기): 1 = original look; <1 straighter fibres; >1 stronger waviness plus a slowly swirling grain direction
+    const tw=safeNum('ribbonTwist',100)/100,sw=Math.max(0,tw-1);
+    const ca=Math.cos(.42),sa=Math.sin(.42);
+    return(x,y)=>{
+      let ca_=ca,sa_=sa;
+      if(sw>0){const an=.42+(n2(x/(s*9)+2.3,y/(s*9)+8.1)-.5)*2.6*sw;ca_=Math.cos(an);sa_=Math.sin(an)}
+      const u=x*ca_+y*sa_,v=-x*sa_+y*ca_;
+      const bend=((n2(u/(s*6),v/(s*6)+3.1)-.5)*s*3.2*(.5+st)+(n2(u/(s*2.2)+7,v/(s*2.2))-.5)*s*.9)*tw;
+      const vv=v+bend;
+      const f=.55*n2(u/(s*7),vv/(s*.32))+.3*n2(u/(s*3.5)+4.4,vv/(s*.15)+1.1)+.15*n2(u/(s*2)+9,vv/(s*.1)+5);
+      return clamp(.5+(f-.5)*(2+2.4*st));
+    };
+  }
+  if(mode==='mottle'){
+    // 얼룩: round, soft-edged spots of varying size on a slowly varying base colour
+    const S=s*2;
+    return(x,y)=>{
+      const wa=(n2(x/(S*1.6),y/(S*1.6))-.5)*1.1,wb=(n2(x/(S*1.6)+6.7,y/(S*1.6)+2.2)-.5)*1.1;
+      const a=x/S+wa,b=y/S+wb,ci=Math.floor(a),cj=Math.floor(b);
+      let best=0,bt=.5;
+      for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){
+        const I=ci+i,J=cj+j;
+        const px=I+.5+(hash(I+11.3,J+4.1)-.5)*.6,py=J+.5+(hash(I+2.7,J+19.9)-.5)*.6,r=.3+.28*hash(I+31.7,J+8.3);
+        const cov=smooth(clamp((r-Math.hypot(a-px,b-py))/(r*(.7-.5*st))));
+        if(cov>best){best=cov;bt=hash(I+5.5,J+23.1)}
+      }
+      const base=clamp(.5+(fbm(x/(S*2.5)+3,y/(S*2.5)+8)-.5)*1.6);
+      return base+(bt-base)*best;
+    };
+  }
+  // 마블링: broad flowing swirls (domain-warped, non-periodic) with a few thin contrasting streaks
+  const sc=s*3.4,fb=(a,b)=>(.6*n2(a,b)+.3*n2(a*2.03+5.2,b*2.03+1.3)+.1*n2(a*4.1+9.1,b*4.1+2.7));
+  return(x,y)=>{
+    const a=x/sc,b=y/sc,k=.9+1.5*st;
+    const q1=fb(a,b),q2=fb(a+5.2,b+1.3);
+    const r1=fb(a+k*q1+1.7,b+k*q2+9.2),r2=fb(a+k*q1+8.3,b+k*q2+2.8);
+    const f=fb(a+k*r1,b+k*r2);
+    const t=clamp(.5+(f-.5)*(2+1.6*st));
+    const vv=Math.abs(fb(a*1.5+k*r2+3.3,b*1.5+k*r1+7.7)-.5);
+    const vein=smooth(clamp(1-vv/.03))*(.12+.22*st);
+    return clamp(t+(1-2*t)*vein);
+  };
+}
+function setProgress(v){const p=$('progress');if(p)p.style.width=clamp(v/100)*100+'%'}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function setPair(rangeId,numId,key){const r=$(rangeId),n=$(numId);if(!r||!n)return;const sync=()=>{n.value=r.value;queueRender(true)};const syncBack=()=>{let v=Number(n.value);if(!Number.isFinite(v))v=defaults[key];const min=Number(r.min)||0,max=Number(r.max)||100;v=clamp(v,min,max);r.value=v;n.value=v;queueRender()};r.addEventListener('input',sync);n.addEventListener('change',syncBack)}
+['size','spread','roughEdge','droplets','pressScale','rotation','whiteThreshold','lineThreshold','linePreserve','engrave','contrast','artFill','rectW','rectH','patternScale','patternStrength','ribbonTwist','depth','gloss','rough'].forEach(k=>setPair(k,k+'Num',k));
+function paletteUI(){const box=$('palette');if(!box)return;box.innerHTML='';state.colors.forEach((hex,i)=>{const row=document.createElement('div');row.className='swatch';const c=document.createElement('input');c.type='color';c.value=hex;const text=document.createElement('div');text.className='hex';text.textContent=hex.toUpperCase();const del=document.createElement('button');del.className='btn mini';del.textContent='×';del.disabled=state.colors.length===1;c.addEventListener('input',()=>{state.colors[i]=c.value;text.textContent=c.value.toUpperCase();queueRender(true)});del.addEventListener('click',()=>{if(state.colors.length>1){state.colors.splice(i,1);paletteUI();queueRender()}});row.append(c,text,del);box.appendChild(row)})}
+paletteUI();
+$('addColor')?.addEventListener('click',()=>{if(state.colors.length<5){state.colors.push(hslHex(Math.random()*360,68,46));paletteUI();queueRender()}});
+$('randomPalette')?.addEventListener('click',()=>{const n=1+Math.floor(Math.random()*5);state.colors=Array.from({length:n},()=>hslHex(Math.random()*360,62+Math.random()*25,33+Math.random()*25));state.seed=Math.floor(Math.random()*1e9);paletteUI();queueRender()});
+const updateTwist=()=>$('twistField')?.classList.toggle('hidden',$('blend')?.value!=='ribbon');
+$('blend')?.addEventListener('change',updateTwist);updateTwist();
+const updateRect=()=>$('rectField')?.classList.toggle('hidden',$('shape')?.value!=='rect');
+$('shape')?.addEventListener('change',updateRect);updateRect();
+$('newPattern')?.addEventListener('click',()=>{state.seed=Math.floor(Math.random()*1e9);state.dropSeed=Math.floor(Math.random()*1e9);queueRender()});
+$('checker')?.addEventListener('change',()=>{$('workspace')?.classList.toggle('solid',!checked('checker'))});
+$('removeWhite')?.addEventListener('change',()=>{$('whiteArea')?.classList.toggle('hidden',!checked('removeWhite'));queueRender()});
+document.querySelectorAll('#mode button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#mode button').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.mode=b.dataset.v;queueRender()}));
+['shape','removeWhite','whiteThreshold','lineThreshold','linePreserve','engrave','contrast','artFill','blend','patternScale','patternStrength','ribbonTwist','depth','gloss','rough','output'].forEach(id=>$(id)?.addEventListener('change',queueRender));
+$('file')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;if(!/^image\/(png|jpeg|webp|gif)$/i.test(f.type)){alert('PNG, JPG, WebP, GIF 이미지를 선택해주세요.');return}const url=URL.createObjectURL(f);const img=new Image();img.onload=()=>{try{state.image=img;state.source=prepareSource(img);state.sourceData=null;state.maskCache={alphaKey:'',designKey:'',alpha:null,design:null,box:null};state.seed=Math.floor(Math.random()*1e9);state.shapeSeed=Math.floor(Math.random()*1e9);state.dropSeed=Math.floor(Math.random()*1e9);$('empty')?.classList.add('hidden');$('status').innerHTML='<b>'+escapeHtml(f.name)+'</b> · 이미지 준비 완료';queueRender()}catch(err){showError(err)}finally{URL.revokeObjectURL(url)}};img.onerror=()=>{showError(new Error('이미지 파일을 읽을 수 없습니다.'));URL.revokeObjectURL(url)};img.src=url});
+function showError(err){console.error(err);setProgress(0);const s=$('status');if(s)s.innerHTML='<b class="warn">렌더링 오류</b> · '+escapeHtml(err?.message||String(err))}
+function prepareSource(img){
+  const maxSide=1400;
+  const scale=Math.min(1,maxSide/Math.max(1,img.naturalWidth,img.naturalHeight));
+  const c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(img.naturalWidth*scale));
+  c.height=Math.max(1,Math.round(img.naturalHeight*scale));
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  if(!ctx)throw new Error('이미지 캔버스를 만들 수 없습니다.');
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.drawImage(img,0,0,c.width,c.height);
+  return c;
+}
+function sourcePixels(){
+  if(!state.source)throw new Error('원본 이미지가 없습니다.');
+  if(state.sourceData)return state.sourceData;
+  const w=state.source.width,h=state.source.height;
+  const ctx=state.source.getContext('2d',{willReadFrequently:true});
+  if(!ctx)throw new Error('이미지 캔버스를 읽을 수 없습니다.');
+  state.sourceData={pixels:ctx.getImageData(0,0,w,h).data,w,h};
+  return state.sourceData;
+}
+function alphaMask(p,w,h){
+  const N=w*h,out=new Uint8Array(N);
+  for(let i=0,q=0;q<N;i+=4,q++)out[q]=p[i+3];
+  if(!checked('removeWhite'))return out;
+  const tol=safeNum('whiteThreshold',30);
+  // Background colour = median colour of the opaque border pixels.
+  const rs=[],gs=[],bs=[];
+  const take=(x,y)=>{const i=(y*w+x)*4;if(p[i+3]>200){rs.push(p[i]);gs.push(p[i+1]);bs.push(p[i+2])}};
+  for(let x=0;x<w;x++){take(x,0);take(x,h-1)}
+  for(let y=1;y<h-1;y++){take(0,y);take(w-1,y)}
+  const med=a=>{if(!a.length)return -1;a.sort((m,n)=>m-n);return a[a.length>>1]};
+  const br=med(rs),bg=med(gs),bb=med(bs),hasBg=br>=0;
+  const dist=q=>{const i=q*4;return Math.max(Math.abs(p[i]-br),Math.abs(p[i+1]-bg),Math.abs(p[i+2]-bb))};
+  const cand=q=>out[q]===0||(hasBg&&dist(q)<=tol);
+  // Flood fill from the border: only background connected to the edge is removed.
+  const isBg=new Uint8Array(N),stack=new Int32Array(N);let sp=0;
+  const seed=q=>{if(!isBg[q]&&cand(q)){isBg[q]=1;stack[sp++]=q}};
+  for(let x=0;x<w;x++){seed(x);seed((h-1)*w+x)}
+  for(let y=0;y<h;y++){seed(y*w);seed(y*w+w-1)}
+  while(sp){const q=stack[--sp],x=q%w,y=(q-x)/w;if(x>0)seed(q-1);if(x<w-1)seed(q+1);if(y>0)seed(q-w);if(y<h-1)seed(q+w)}
+  const soft=tol*.9+6;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const q=y*w+x;
+    if(isBg[q]){out[q]=0;continue}
+    if(!hasBg)continue;
+    if((x>0&&isBg[q-1])||(x<w-1&&isBg[q+1])||(y>0&&isBg[q-w])||(y<h-1&&isBg[q+w])){
+      out[q]=Math.round(out[q]*clamp((dist(q)-tol*.5)/soft));
+    }
+  }
+  return out;
+}
+function alphaBounds(a,w,h){
+  let minX=w,minY=h,maxX=-1,maxY=-1;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    if(a[y*w+x]>8){if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}
+  }
+  if(maxX<0)return{x:0,y:0,w,h};
+  return{x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1};
+}
+function darkMap(p,w,h,alpha){
+  const out=new Float32Array(w*h);
+  for(let i=0,q=0;q<out.length;i+=4,q++){
+    if(alpha[q]===0)continue;
+    const g=p[i]*.299+p[i+1]*.587+p[i+2]*.114;
+    out[q]=(1-g/255)*(p[i+3]/255);
+  }
+  return out;
+}
+function makeCurve(){
+  if(state.mode!=='line')return v=>v;
+  const thr=safeNum('lineThreshold',190),pres=safeNum('linePreserve',96)/100;
+  const center=(255-thr)/255,softness=.11+(1-pres)*.08;
+  const low=Math.max(.01,center-softness),high=Math.min(.99,center+softness),span=Math.max(.001,high-low),ex=.88+(1-pres)*.24,gain=.68+pres*.32;
+  return dark=>clamp(Math.pow(smooth(clamp((dark-low)/span)),ex)*gain);
+}
+function blurMap(a,w,h,r){
+  // Two box passes per axis (~gaussian). Blur + threshold smooths the stair-steps of a low-res source when it is enlarged.
+  let src=a,n=2*r+1;
+  for(let pass=0;pass<4;pass++){
+    const dst=new Float32Array(w*h),horiz=pass%2===0;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){let t=0;for(let k=-r;k<=r;k++){const xx=horiz?Math.min(w-1,Math.max(0,x+k)):x,yy=horiz?y:Math.min(h-1,Math.max(0,y+k));t+=src[yy*w+xx]}dst[y*w+x]=t/n}
+    src=dst;
+  }
+  return src;
+}
+function boxDown(a,w,h,f){
+  const nw=Math.ceil(w/f),nh=Math.ceil(h/f),o=new Float32Array(nw*nh);
+  for(let y=0;y<nh;y++)for(let x=0;x<nw;x++){let s=0,c=0;for(let j=0;j<f;j++){const yy=y*f+j;if(yy>=h)break;for(let i=0;i<f;i++){const xx=x*f+i;if(xx>=w)break;s+=a[yy*w+xx];c++}}o[y*nw+x]=c?s/c:0}
+  return{arr:o,w:nw,h:nh};
+}
+const softWr=v=>v-.25*(v+Math.sqrt(v*v+.0064));
+function ipow(v,n){if(n!==(n|0))return Math.pow(v,n);let r=1;while(n>0){if(n&1)r*=v;v*=v;n>>=1}return r}
+function shapeDepth(x,y,cx,cy,w,h,shape,irr,rot,seed,angPre,hp){const a=rot*Math.PI/180,co=Math.cos(a),si=Math.sin(a),dx=x-cx,dy=y-cy,X=dx*co+dy*si,Y=-dx*si+dy*co,rx=w*.5,ry=h*.5;if(rx<1||ry<1)return 0;const ang=angPre!==undefined?angPre:Math.atan2(Y,X);const wob=irr?irr*(.10*Math.sin(ang*3+seed*.000001)+.055*Math.sin(ang*7-seed*.0000017)+.025*Math.sin(ang*11+1.9)):0;if(shape==='circle'||shape==='ellipse'||shape==='blob'){const r=Math.hypot(X/rx,Y/ry),limit=1+wob;return clamp((limit-r)/Math.max(.001,limit));}if(shape==='rounded'){/* squircle gauge: every nested layer stays rounded, no flat plateau with a hard square inside */const ax=Math.abs(X/rx),ay=Math.abs(Y/ry),a2=ax*ax,b2=ay*ay;return clamp(1-Math.sqrt(Math.sqrt(a2*a2+b2*b2)));}if(shape==='square'||shape==='rect'){/* sharp-cornered rectangle; deep interior fades to radial to avoid pyramid creases */const sa_=Math.abs(X/rx),sb_=Math.abs(Y/ry);const g=hp>0?Math.pow(ipow(sa_,hp)+ipow(sb_,hp),1/hp):Math.max(sa_,sb_);return hp===-1?1-g:clamp(1-g);}if(shape==='hex'){/* hexagon that exactly fits its bounding box. hp falsy = sharp corners (stamp face); hp>0 = rounded corners via p-norm smooth-max (outer wax) */const X1=X/rx,Y1=Y/ry,e1=Y1+.5*X1,e2=Y1-.5*X1,e3=-Y1+.5*X1,e4=-Y1-.5*X1;let g;if(!(hp>0))g=Math.max(X1,-X1,e1,e2,e3,e4);else{const q=v=>v>0?ipow(v,hp):0;g=Math.pow(q(X1)+q(-X1)+q(e1)+q(e2)+q(e3)+q(e4),1/hp)}return hp===-1?1-g:clamp(1-g);}return 0}
+function renderSizes(max){const n=Math.max(64,Math.round(max));return{w:n,h:n}}
+function bilinear(arr,w,h,x,y){const xx=clamp(x,0,w-1),yy=clamp(y,0,h-1),x0=Math.floor(xx),y0=Math.floor(yy),x1=Math.min(w-1,x0+1),y1=Math.min(h-1,y0+1),fx=xx-x0,fy=yy-y0;const a=arr[y0*w+x0],b=arr[y0*w+x1],c=arr[y1*w+x0],d=arr[y1*w+x1];return a+(b-a)*fx+((c+(d-c)*fx)-(a+(b-a)*fx))*fy}
+const CWX=new Float64Array(4),CWY=new Float64Array(4);
+function crw(t,o){const t2=t*t,t3=t2*t;o[0]=-.5*t3+t2-.5*t;o[1]=1.5*t3-2.5*t2+1;o[2]=-1.5*t3+2*t2+.5*t;o[3]=.5*t3-.5*t2}
+function cubic(arr,w,h,x,y){
+  const x0=Math.floor(x),y0=Math.floor(y);crw(x-x0,CWX);crw(y-y0,CWY);
+  let s=0;
+  for(let j=0;j<4;j++){const yy=Math.min(h-1,Math.max(0,y0-1+j)),row=yy*w;let r=0;for(let i=0;i<4;i++){r+=arr[row+Math.min(w-1,Math.max(0,x0-1+i))]*CWX[i]}s+=r*CWY[j]}
+  return s;
+}
+function presentSmooth(workCanvas,outCanvas,w,h){
+  const ctx=outCanvas.getContext('2d');
+  if(!ctx)throw new Error('Canvas 2D를 만들 수 없습니다.');
+  outCanvas.width=w;outCanvas.height=h;ctx.clearRect(0,0,w,h);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(workCanvas,0,0,workCanvas.width,workCanvas.height,0,0,w,h);
+  return ctx;
+}
+// "그림에 맞춤": build a smooth filled silhouette of the artwork on a coarse grid, as a signed distance field (inside > 0).
+function buildBlob(d,sw,sh){
+  let x0=sw,y0=sh,x1=-1,y1=-1;
+  for(let y=0;y<sh;y++)for(let x=0;x<sw;x++)if(d[y*sw+x]>.2){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  if(x1<0){x0=0;y0=0;x1=sw-1;y1=sh-1}
+  const G=256,N=G*G,cs=Math.max(x1-x0+1,y1-y0+1)*2.1/G,gx0=(x0+x1)/2-G*cs/2,gy0=(y0+y1)/2-G*cs/2;
+  let m=new Float32Array(N);
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(d[y*sw+x]>.2)m[Math.floor((y-gy0)/cs)*G+Math.floor((x-gx0)/cs)]=1;
+  const win=(a,r,mx)=>{const t=new Float32Array(N),o=new Float32Array(N);for(let p=0;p<2;p++){const src=p?t:a,dst=p?o:t;for(let y=0;y<G;y++)for(let x=0;x<G;x++){let v=0;for(let k=-r;k<=r;k++){const xx=p?x:x+k,yy=p?y+k:y;if(xx<0||yy<0||xx>=G||yy>=G)continue;const q=src[yy*G+xx];v=mx?Math.max(v,q):v+q}dst[y*G+x]=mx?v:v/(2*r+1)}}return o};
+  m=win(m,4,1);
+  const outside=new Uint8Array(N),st=[],push=i=>{if(!outside[i]&&!m[i]){outside[i]=1;st.push(i)}};
+  for(let i=0;i<G;i++){push(i);push((G-1)*G+i);push(i*G);push(i*G+G-1)}
+  while(st.length){const i=st.pop(),x=i%G,y=(i/G)|0;if(x>0)push(i-1);if(x<G-1)push(i+1);if(y>0)push(i-G);if(y<G-1)push(i+G)}
+  for(let i=0;i<N;i++)m[i]=outside[i]?0:1;
+  m=win(win(m,3),3);
+  const cham=isT=>{const D=new Float32Array(N);for(let i=0;i<N;i++)D[i]=isT(i)?0:1e9;
+    for(let y=0;y<G;y++)for(let x=0;x<G;x++){const i=y*G+x;let v=D[i];if(x>0)v=Math.min(v,D[i-1]+1);if(y>0){v=Math.min(v,D[i-G]+1);if(x>0)v=Math.min(v,D[i-G-1]+1.4142);if(x<G-1)v=Math.min(v,D[i-G+1]+1.4142)}D[i]=v}
+    for(let y=G-1;y>=0;y--)for(let x=G-1;x>=0;x--){const i=y*G+x;let v=D[i];if(x<G-1)v=Math.min(v,D[i+1]+1);if(y<G-1){v=Math.min(v,D[i+G]+1);if(x<G-1)v=Math.min(v,D[i+G+1]+1.4142);if(x>0)v=Math.min(v,D[i+G-1]+1.4142)}D[i]=v}
+    return D};
+  const dIn=cham(i=>m[i]<=.5),dOut=cham(i=>m[i]>.5);
+  let sdf=new Float32Array(N);for(let i=0;i<N;i++)sdf[i]=m[i]>.5?dIn[i]-.5:-(dOut[i]-.5);
+  sdf=win(win(sdf,1),1);
+  let Rs=1,bx0=G,bx1=-1,by0=G,by1=-1;
+  for(let y=0;y<G;y++)for(let x=0;x<G;x++){const v=sdf[y*G+x];if(v>Rs)Rs=v;if(v>0){if(x<bx0)bx0=x;if(x>bx1)bx1=x;if(y<by0)by0=y;if(y>by1)by1=y}}
+  if(bx1<0){bx0=0;bx1=G-1;by0=0;by1=G-1}
+  return{G,cs,gx0,gy0,sdf,Rs,bx0,bx1,by0,by1};
+}
+function render(isExport=false,done,fast=false){
+  if(!state.image){done?.(false);return}
+  const token=++state.token;
+  const targetMax=isExport?clamp(Math.round(safeNum('output',1200)),64,4096):700;
+  // Preview: light supersampling for visible AA without the old 2x cost.
+  // Export: 1.25x internal resolution (1x for very large sizes to save memory), then high-quality downsample.
+  const ss=isExport&&targetMax>2000?1:(isExport?1.25:1);
+  const cap=isExport?4096:900;
+  const fullWork=Math.min(cap,Math.max(560,Math.round(targetMax*ss)));
+  const workMax=fast?Math.round(fullWork*.55):fullWork;
+  const {w,h}=renderSizes(workMax);
+  const outW=Math.max(64,Math.round(targetMax)),outH=outW;
+  $('status').textContent=isExport?'고해상도 렌더링 중…':'실링 렌더링 중…';setProgress(3);
+  setTimeout(()=>{if(token!==state.token)return;try{
+    const src=sourcePixels(),p=src.pixels,sw=src.w,sh=src.h;
+    const aKey=checked('removeWhite')?'1:'+safeNum('whiteThreshold',30):'0';
+    if(state.maskCache.alphaKey!==aKey||!state.maskCache.alpha){
+      state.maskCache.alpha=alphaMask(p,sw,sh);state.maskCache.box=alphaBounds(state.maskCache.alpha,sw,sh);state.maskCache.alphaKey=aKey;state.maskCache.dark=null;state.maskCache.mips={};state.maskCache.blob=null;state.maskCache.blobKey='';
+    }
+    const a=state.maskCache.alpha,box=state.maskCache.box;
+    if(!state.maskCache.dark){state.maskCache.dark=darkMap(p,sw,sh,a);state.maskCache.mips={}}
+    const dk=state.maskCache.dark,curve=makeCurve();
+    const dKey=state.mode+':'+safeNum('lineThreshold',190)+':'+safeNum('linePreserve',96);
+    setProgress(15);
+    const shape=$('shape')?.value||'circle',size=safeNum('size',100)/100,spread=safeNum('spread',50)/100,irr=safeNum('roughEdge',70)/100,irrW=(v=>v<=1?v:1+.4*(v-1))(safeNum('roughEdge',70)/100),press=safeNum('pressScale',86)/100,rot=safeNum('rotation',0),depth3d=safeNum('depth',96)/100,engrave=safeNum('engrave',85)/100,contrast=safeNum('contrast',92)/100;
+    const minSide=Math.min(w,h);let cx=w/2,cy=h/2;
+    let outerW,outerH;
+    // Base size keeps the shape's aspect ratio; if it would exceed the canvas the whole shape is scaled down uniformly (so an ellipse never turns into a circle).
+    let bW,bH;
+    if(shape==='ellipse'){bW=minSide*.86*size;bH=bW/1.28}
+    else if(shape==='rounded'){bW=minSide*.86*size*1.06;bH=minSide*.86*size*.92}
+    else if(shape==='square'){bW=minSide*.82*size;bH=bW}
+    else if(shape==='rect'){bW=minSide*.90*size*safeNum('rectW',100)/100;bH=minSide*.90*size*safeNum('rectH',70)/100}
+    else {bW=minSide*.90*size;bH=bW}
+    const capK=Math.min(1,w*.9794/bW,h*.9794/bH);
+    outerW=bW*capK;outerH=bH*capK;
+    // The wax is built as several nested pressure layers, closer to real seal references:
+    // a thick outer mass, a rounded shoulder, a distinct raised pressure ring,
+    // and a slightly recessed central stamping face. The outer lip is intentionally
+    // more irregular than the inner face.
+    const lipScale=1+spread*.22;outerW*=.86;outerH*=.86;
+    // Hex / square / rect: the wax always extends at least minLipK x the body size around the stamp (wobble can only add lobes beyond it, never dent it),
+    // so the pressed-out wax really fills the area around the stamp. Higher 눌려 퍼짐 = wider fill.
+    // Splash lobes: a few smooth, rounded tongues of wax pushed out of the outline (like a splash), growing with 외곽 울렁임. Same maths is used by the fit and the render.
+    const lobeAmt=clamp((irrW-.45)/.55,0,1.25),LOB=[];
+    {let ls=((state.shapeSeed>>>0)^0x9E3779B1)>>>0;const lr=()=>{ls=(ls+0x6D2B79F5)>>>0;let t=ls;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296};
+      if(lobeAmt>0){const nL=3+Math.floor(lr()*2),a0=lr()*6.283;for(let k=0;k<nL;k++)LOB.push({a:a0+k*6.283/nL+(lr()-.5)*1.1,sg:.17+.16*lr(),A:minSide*(.035+.05*lr())*lobeAmt*(.6+.6*spread)})}}
+    const lobeG=ang=>{let g=0;for(let k=0;k<LOB.length;k++){const L=LOB[k];let d=ang-L.a;if(d>Math.PI)d-=6.2831853;else if(d<-Math.PI)d+=6.2831853;if(d*d>9*L.sg*L.sg)continue;g+=L.A*Math.exp(-(d*d)/(L.sg*L.sg))}return g};
+    const polyS=shape==='hex'||shape==='square'||shape==='rect',minLipK=1.04+.12*spread;
+    // Fit: keep the WHOLE wax (wobble + spread included) inside the canvas, centred, with a margin (more room when droplets are on).
+    // The silhouette is measured analytically on a grid that extends past the canvas (so parts that would be cut off are seen),
+    // then the wax is shrunk / shifted until it fits. Same silhouette maths as the render loop below.
+    if(shape!=='blob'){
+      const mg=Math.max(4,w*.025);
+      const oW0=outerW,oH0=outerH,kBf=(shape==='hex'||shape==='square'||shape==='rect')?Math.min(1,clamp(press,.52,.92)+.14):1;
+      const osF=minSide/875,lipWarpF=minSide*(.02+.05*spread)*(.25+1.5*irrW),wrF=softWr;
+      const stp=Math.max(3,Math.round(w/150)),ext=Math.round(w*.45);
+      const gnx=Math.ceil((w+2*ext)/stp),gny=Math.ceil((h+2*ext)/stp),gWA=new Float32Array(gnx*gny),gWB=new Float32Array(gnx*gny);
+      {const wf=makeWarp(state.shapeSeed,minSide);for(let gy=0;gy<gny;gy++)for(let gx=0;gx<gnx;gx++){const x=-ext+gx*stp,y=-ext+gy*stp;gWA[gy*gnx+gx]=wrF(wf(x,y,0)*1.6)*lipWarpF;gWB[gy*gnx+gx]=wrF(wf(x,y,1)*1.6)*lipWarpF}}
+      const measure=(sc,cxC,cyC,rot,m=1)=>{
+        const arF=rot*Math.PI/180,coF=Math.cos(arF),siF=Math.sin(arF);
+        const oW=oW0*sc,oH=oH0*sc,lW=Math.min(w*.9954,oW*lipScale),lH=Math.min(h*.9954,oH*lipScale);
+        let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,sx=0,sy=0,cnt=0;
+        try{
+          for(let gy=0;gy<gny;gy+=m)for(let gx=0;gx<gnx;gx+=m){
+            const x=-ext+gx*stp,y=-ext+gy*stp;
+            const dx=x-cxC,dy=y-cyC,ang=Math.atan2(-dx*siF+dy*coF,dx*coF+dy*siF);
+            let wx=gWA[gy*gnx+gx],wy=gWB[gy*gnx+gx];if(LOB.length){const g=lobeG(ang),dd=Math.hypot(dx,dy)||1;wx-=g*dx/dd;wy-=g*dy/dd}
+            let inside=shapeDepth(x+wx,y+wy,cxC,cyC,lW,lH,shape,irr*1.28*.15,rot,state.shapeSeed+31,ang,5)>0;
+            if(!inside)inside=shapeDepth(x,y,cxC,cyC,oW*kBf,oH*kBf,shape,irr*.72*.15,rot,state.shapeSeed+17,ang,8)>0;
+            if(!inside&&polyS)inside=shapeDepth(x,y,cxC,cyC,oW*minLipK,oH*minLipK,shape,irr*1.28*.15,rot,state.shapeSeed+31,ang,7)>0;
+            if(inside){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;sx+=x;sy+=y;cnt++}
+          }
+        }finally{}
+        return x1<x0?null:{x0:x0-stp*m,x1:x1+stp*m,y0:y0-stp*m,y1:y1+stp*m,mx:sx/cnt,my:sy/cnt};
+      };
+      // Scale is chosen once for ALL rotations (cached), so moving the 회전 slider never changes the stamp size; only the position follows the rotation.
+      const runFit=(rr,sc0,m=1)=>{
+      let sc=sc0,cxC=cx,cyC=cy;
+      for(let it=0;it<8;it++){
+        const bb=measure(sc,cxC,cyC,rr,m);if(!bb)break;
+        const bw=bb.x1-bb.x0,bh=bb.y1-bb.y0,need=Math.min((w-2*mg)/bw,(h-2*mg)/bh);
+        let dx,dy;
+        if(need<1){dx=w/2-(bb.x0+bb.x1)/2;dy=h/2-(bb.y0+bb.y1)/2;sc*=Math.max(.6,need*.985)}
+        else{dx=Math.max(mg-bb.x0,Math.min(w-mg-bb.x1,w/2-bb.mx));dy=Math.max(mg-bb.y0,Math.min(h-mg-bb.y1,h/2-bb.my))}
+        if(need>=1&&Math.abs(dx)<=w*.004&&Math.abs(dy)<=w*.004)break;
+        cxC+=dx;cyC+=dy;
+        if(it===7)sc*=.93;
+      }
+      return{sc,cxC,cyC}};
+      const fk=[w,h,shape,size,spread,irr,press,state.shapeSeed,safeNum('rectW',100),safeNum('rectH',70)].join('|');
+      let scAll;
+      if(state.fitScK===fk)scAll=state.fitScV;
+      else{scAll=1;for(const rr of [0,45,90,135])scAll=Math.min(scAll,runFit(rr,1,2).sc);state.fitScK=fk;state.fitScV=scAll}
+      const fr=runFit(rot,scAll);
+      outerW=oW0*fr.sc;outerH=oH0*fr.sc;cx=fr.cxC;cy=fr.cyC;
+    }
+    const lipW=Math.min(w*.9954,outerW*lipScale),lipH=Math.min(h*.9954,outerH*lipScale);
+    const faceScale=clamp(press,.52,.92);
+    const faceW=outerW*faceScale,faceH=outerH*faceScale;
+    const ringOuterScale=clamp(faceScale*1.06,.56,.94);
+    const ringInnerScale=clamp(faceScale*.88,.48,.86);
+    const edgeInnerScale=clamp(.86+depth3d*.04,.84,.92);
+    const ringOuterW=outerW*ringOuterScale,ringOuterH=outerH*ringOuterScale;
+    const ringInnerW=outerW*ringInnerScale,ringInnerH=outerH*ringInnerScale;
+    const edgeInnerW=outerW*edgeInnerScale,edgeInnerH=outerH*edgeInnerScale;
+    const coreW=faceW*.84,coreH=faceH*.84;
+    // Fit the artwork INSIDE the stamping face, not merely inside its bounding box.
+    // For round/oval faces, the largest rectangle is limited by the ellipse equation;
+    // this prevents corners of the artwork from sticking into the wax rim.
+    const bw=Math.max(1,box.w),bh=Math.max(1,box.h);
+    // artFill (30..200): how much of the stamping face the artwork occupies; 100 = artwork's bounding box inscribed in the face, above 100 the artwork is larger than the face and is cut off at the stamp edge (faceClip below).
+    const artF=safeNum('artFill',90)/100,fillK=artF/.9;
+    let fit;
+    if(shape==='circle'||shape==='ellipse'||shape==='blob'){
+      const denom=Math.sqrt((bw/Math.max(1,faceW))**2+(bh/Math.max(1,faceH))**2);
+      fit=Math.min(artF/Math.max(.001,denom), (faceW*artF)/bw, (faceH*artF)/bh);
+    }else{
+      fit=Math.min((faceW*.88*fillK)/bw,(faceH*.88*fillK)/bh,shape==='hex'?.92*artF/(bh/faceH+.5*bw/faceW):9e9);
+    }
+    fit=Math.max(.08,fit);
+    const designW=bw*fit,designH=bh*fit,ox=cx-designW/2,oy=cy-designH/2;
+    // 그림에 맞춤: wax body follows the artwork silhouette; face boundary = silhouette, so the art stays inside.
+    const fitMode=shape==='blob';let blobDepth=null,fitM=fit,oxM=ox,oyM=oy,boxM=box;
+    if(fitMode){
+      const bk=aKey;if(state.maskCache.blobKey!==bk||!state.maskCache.blob){state.maskCache.blob=buildBlob(dk,sw,sh);state.maskCache.blobKey=bk}
+      const bs=state.maskCache.blob,pad=bs.Rs*(1-faceScale)/faceScale,bodyW=bs.bx1-bs.bx0+1+2*pad,bodyH=bs.by1-bs.by0+1+2*pad;
+      const k=Math.min(w*.9794,minSide*.90*size)*.85/Math.max(bodyW,bodyH),gcx=(bs.bx0+bs.bx1+1)/2,gcy=(bs.by0+bs.by1+1)/2,R=(bs.Rs+pad)*k;
+      blobDepth=(x,y,sc)=>{const sd=(bilinear(bs.sdf,bs.G,bs.G,(x-cx)/k+gcx-.5,(y-cy)/k+gcy-.5)+pad)*k;return clamp((sd-R*(1-sc))/(R*sc))};
+      fitM=k/bs.cs*fillK;boxM={x:0,y:0,w:sw,h:sh};oxM=cx-(bs.gx0+gcx*bs.cs)*fitM;oyM=cy-(bs.gy0+gcy*bs.cs)*fitM;
+    }
+    const SD=(x,y,cx_,cy_,W,H,sh_,ir,r,sd,hp)=>fitMode?blobDepth(x,y,W/outerW):shapeDepth(x,y,cx_,cy_,W,H,sh_,ir*.15,r,sd,curAng,hp);
+    // Artwork sampler: bicubic on the raw darkness map, threshold applied afterwards (smooth contours, no stair-steps).
+    const mf=Math.max(1,Math.floor(1/Math.max(.05,fitM)+.5));
+    let dm=dk,dw=sw,dh=sh;
+    if(mf>1){const mk='m'+mf;if(!state.maskCache.mips[mk])state.maskCache.mips[mk]=boxDown(dk,sw,sh,mf);const m=state.maskCache.mips[mk];dm=m.arr;dw=m.w;dh=m.h}
+    else if(fitM>1.25){const br=Math.min(3,Math.max(1,Math.round(.35*fitM))),bk='b'+br;if(!state.maskCache.mips[bk])state.maskCache.mips[bk]=blurMap(dk,sw,sh,br);dm=state.maskCache.mips[bk]}
+    const dBw=boxM.w*fitM,dBh=boxM.h*fitM;
+    const designAt=(x,y)=>{
+      if(x<oxM||y<oyM||x>=oxM+dBw||y>=oyM+dBh)return 0;
+      const sx=(boxM.x+(x-oxM)/fitM+.5)/mf-.5,sy=(boxM.y+(y-oyM)/fitM+.5)/mf-.5;
+      return curve(clamp(cubic(dm,dw,dh,sx,sy)));
+    };
+    // Per-resolution caches: noise fields, pattern and angle only change with seed / size / their own sliders.
+    const cm=state.cacheMap||(state.cacheMap={});if(Object.keys(cm).length>8)for(const k in cm)delete cm[k];
+    const nk='n:'+w+'x'+h+':'+state.shapeSeed+':'+state.seed;
+    if(!cm[nk]){const wa=new Float32Array(w*h),wb=new Float32Array(w*h),ln=new Float32Array(w*h),fn=new Float32Array(w*h);
+      const os=minSide/875,colorSeed=state.seed,wfN=makeWarp(state.shapeSeed,minSide);state.seed=state.shapeSeed;// silhouette noise depends only on the shape seed
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;wa[i]=wfN(x,y,0);wb[i]=wfN(x,y,1);ln[i]=noise(x+211*os,y-97*os,minSide*.25)}
+      state.seed=colorSeed;
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++)fn[y*w+x]=hash(x*1.31,y*1.71)-.5
+      cm[nk]={wa,wb,ln,fn}}
+    const NF=cm[nk];
+    const ak='a:'+w+'x'+h+':'+rot+':'+Math.round(cx*100)+':'+Math.round(cy*100);
+    if(!cm[ak]){const a_=new Float32Array(w*h),ar=rot*Math.PI/180,co=Math.cos(ar),si=Math.sin(ar);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){const dx=x-cx,dy=y-cy;a_[y*w+x]=Math.atan2(-dx*si+dy*co,dx*co+dy*si)}
+      cm[ak]=a_}
+    const ANG=cm[ak];
+    const ps=fullWork/w,pk='p:'+w+'x'+h+':'+state.seed+':'+($('blend')?.value||'')+':'+safeNum('patternScale',68)+':'+safeNum('patternStrength',78)+':'+safeNum('ribbonTwist',100)+':'+ps;
+    if(!cm[pk]){
+      // evaluate at half resolution, then upsample (patterns are smooth; 4x cheaper)
+      const pf=makePattern(w*ps,h*ps),gw=Math.ceil(w/2)+1,gh=Math.ceil(h/2)+1,lo=new Float32Array(gw*gh),pa=new Float32Array(w*h);
+      for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++)lo[gy*gw+gx]=pf(gx*2*ps,gy*2*ps);
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++)pa[y*w+x]=bilinear(lo,gw,gh,x/2,y/2);
+      cm[pk]=pa}
+    const PAT=cm[pk];
+    const lut=new Float32Array(768);for(let k=0;k<256;k++){const c=paletteAt(k/255);lut[k*3]=c.r;lut[k*3+1]=c.g;lut[k*3+2]=c.b}
+    let curAng=0;
+    const RW=.06;const isPoly=shape==='hex'||shape==='square'||shape==='rect';
+    // Where the squeezed-out spread starts (the rounded outer contour) follows the stamp size: constant .14 gap outside the stamp face, capped at the wax body.
+    const kB=isPoly?Math.min(1,faceScale+.14):1;
+    // The squeezed-out zone between the wax outline and the stamp face is one continuous slope: it reaches the plateau right at the stamp face,
+    // so shrinking/enlarging the stamp (압인 크기) re-shapes this zone. 1.10 = margin so the sharp face corners already sit on the plateau.
+    const DpB=Math.max(.03,1-faceScale*1.10);
+    const ramp=(d,D)=>{const t=Math.min(1,d/D);return t*t*(3-2*t)};
+    const satd=(d,D)=>d>=D?D*.5:d-d*d/(2*D);
+    const heights=new Float32Array(w*h),lipMap=new Uint8Array(w*h),rimMap=new Uint8Array(w*h),shoulderMap=new Uint8Array(w*h),faceEdgeMap=new Uint8Array(w*h),stampMap=new Uint8Array(w*h);
+    // Pass 1: wax thickness-from-edge field (OUTF) and body field (BODY). Lip only is domain-warped so the squeezed-out wax spreads in irregular lobes.
+    const lipSpan=Math.max(.02,1-1/lipScale),lipWarp=minSide*(.02+.05*spread)*(.25+1.5*irrW);
+    const NPX=w*h,OUTF=new Float32Array(NPX),BODY=new Float32Array(NPX);
+    // Pixels farther than this from the centre can never be wax (generous bound), so pass 1 skips them.
+    const Rb2=(()=>{if(shape==='blob')return 1e18;const mw=Math.max(lipW,outerW*minLipK)*.5,mh=Math.max(lipH,outerH*minLipK)*.5;let lm=0;for(const L of LOB)lm+=L.A;const R=Math.hypot(mw,mh)*1.08+lipWarp*1.2+lm+4;return R*R})();
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const i=y*w+x;if((x-cx)*(x-cx)+(y-cy)*(y-cy)>Rb2)continue;curAng=ANG[i];
+      let wx=softWr(NF.wa[i]*1.6)*lipWarp,wy=softWr(NF.wb[i]*1.6)*lipWarp;if(LOB.length){const g=lobeG(curAng),dx=x-cx,dy=y-cy,dd=Math.hypot(dx,dy)||1;wx-=g*dx/dd;wy-=g*dy/dd}
+      let outerRaw=SD(x+wx,y+wy,cx,cy,lipW,lipH,shape,irr*1.28,rot,state.shapeSeed+31,5);
+      if(polyS){const dmL=SD(x,y,cx,cy,outerW*minLipK,outerH*minLipK,shape,irr*1.28,rot,state.shapeSeed+31,7);if(dmL>0)outerRaw=Math.max(outerRaw,dmL*lipSpan/Math.max(.02,1-1/minLipK))}
+      const body=SD(x,y,cx,cy,outerW*kB,outerH*kB,shape,irr*.72,rot,state.shapeSeed+17,8);
+      BODY[i]=body;OUTF[i]=Math.max(outerRaw,body*.6);
+    }
+    // Splash-like silhouette: round off ledges, pinches and sharp notches of the outline (curvature smoothing of the wax mask).
+    // Tips get rounded, necks fill in smoothly; the outline can only move inside the original bounding box, so nothing gets clipped.
+    {const rS=Math.max(2,Math.round(w*.013)),M=new Float32Array(NPX),T=new Float32Array(NPX);
+      for(let i=0;i<NPX;i++)M[i]=OUTF[i]>0?1:0;
+      for(let pass=0;pass<2;pass++){
+        for(let y=0;y<h;y++){const row=y*w;let sum=0;for(let x=0;x<=rS&&x<w;x++)sum+=M[row+x];
+          for(let x=0;x<w;x++){T[row+x]=sum/(2*rS+1);const xa=x+rS+1,xr=x-rS;if(xa<w)sum+=M[row+xa];if(xr>=0)sum-=M[row+xr]}}
+        for(let x=0;x<w;x++){let sum=0;for(let y=0;y<=rS&&y<h;y++)sum+=T[y*w+x];
+          for(let y=0;y<h;y++){M[y*w+x]=sum/(2*rS+1);const ya=y+rS+1,yr=y-rS;if(ya<h)sum+=T[ya*w+x];if(yr>=0)sum-=T[yr*w+x]}}
+      }
+      const D=new Float32Array(NPX),BIG=1e9;
+      for(let i=0;i<NPX;i++)D[i]=M[i]>.5?BIG:0;
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;let v=D[i];if(v===0)continue;v=(x===0||y===0)?1:v;if(x>0)v=Math.min(v,D[i-1]+1);if(y>0){v=Math.min(v,D[i-w]+1);if(x>0)v=Math.min(v,D[i-w-1]+1.4142);if(x<w-1)v=Math.min(v,D[i-w+1]+1.4142)}D[i]=v}
+      for(let y=h-1;y>=0;y--)for(let x=w-1;x>=0;x--){const i=y*w+x;let v=D[i];if(v===0)continue;v=(x===w-1||y===h-1)?Math.min(v,1):v;if(x<w-1)v=Math.min(v,D[i+1]+1);if(y<h-1){v=Math.min(v,D[i+w]+1);if(x<w-1)v=Math.min(v,D[i+w+1]+1.4142);if(x>0)v=Math.min(v,D[i+w-1]+1.4142)}D[i]=v}
+      const Rref=Math.max(8,(lipW+lipH)*.25),dW=Rref*lipSpan*2;
+      for(let i=0;i<NPX;i++){
+        if(M[i]<=.5){OUTF[i]=0;continue}
+        const o=OUTF[i],alt=D[i]/Rref,cand=o>0?Math.min(o,alt):alt,k=smooth(D[i]/dW);
+        OUTF[i]=Math.max(1e-4,cand*(1-k)+o*k);
+      }
+    }
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const i=y*w+x;curAng=ANG[i];
+      const body=BODY[i],outer=OUTF[i];
+      const edgeInner=SD(x,y,cx,cy,edgeInnerW,edgeInnerH,shape,0,rot,state.shapeSeed+91,8);
+      const ringOuter=SD(x,y,cx,cy,ringOuterW,ringOuterH,shape,0,rot,state.shapeSeed+107,14);
+      const face=SD(x,y,cx,cy,faceW,faceH,shape,0,rot,state.shapeSeed+53,0);
+      const core=SD(x,y,cx,cy,coreW,coreH,shape,0,rot,state.shapeSeed+77,0);
+      if(outer<=0){heights[i]=0;continue}
+      // Rolled bead at the very edge, thinner flat skirt behind it, fading out as the dome rises.
+      const lipT=clamp(outer/lipSpan),lipRoll=Math.sqrt(clamp(1-(1-Math.min(1,lipT/.06))**2));
+      let outerLip,pressureRing,faceBand,central,mound,edgeLift;
+      if(isPoly){
+        // Hex / square / rect: every layer saturates into a true plateau, so the stamp interior is perfectly flat (no corner-to-centre creases).
+        // The wall rises over a short band at the rim, a raised frame sits just outside the stamp face, and the face is a sharp-cornered recess.
+        const faceRaw=SD(x,y,cx,cy,faceW,faceH,shape,0,rot,state.shapeSeed+53,-1),dFace=Math.max(0,-faceRaw-RW)*faceScale,uu=body/(body+dFace+1e-6),bodyN=smooth(uu),skirt=.12*ramp(outer,lipSpan*1.5);
+        outerLip=lipRoll*Math.pow(lipT,.8)*(1-bodyN);
+        mound=Math.pow(skirt+(1-skirt)*bodyN,1.24);
+        edgeLift=0;
+        pressureRing=.06*smooth(clamp(1+faceRaw/RW));  // sharp-cornered raised border hugging the stamp; width scales with the stamp size
+        faceBand=clamp(6.4*satd(face,.05));
+        central=0;
+      }else{
+        outerLip=lipRoll*Math.pow(lipT,.8)*(1-smooth(body/.5));
+        const outerEdge=clamp(body-edgeInner*.97);
+        pressureRing=clamp(ringOuter-face*.98);
+        faceBand=clamp(face-core);
+        central=clamp(core);
+        mound=Math.pow(body+(outer-body)*(1-smooth(body/.3)),1.24);
+        edgeLift=Math.pow(outerEdge,1.08);
+      }
+      const ringLift=Math.pow(pressureRing,.6);
+      const faceSlope=Math.pow(faceBand,.6);
+      const lipLift=outerLip*(.75+.5*NF.ln[i]);
+      // Strong vertical relief, but confined to the existing wax footprint.
+      let z=.085*lipRoll
+        +mound*(.18+.34*depth3d)
+        +edgeLift*(.07+.24*depth3d)
+        +ringLift*(.10+.32*depth3d)
+        +lipLift*(.04+.05*spread+.05*depth3d)
+        -faceSlope*(.028+.10*depth3d)
+        -central*(.018+.035*depth3d);
+      const faceClip=smooth(clamp((face-.035)/.085));
+      const stampVal=designAt(x,y)*faceClip,stamp=clamp(stampVal)*contrast;
+      const cavityDepth=(.085+.25*engrave)*(.58+.42*depth3d),floor=.16+.10*depth3d,available=Math.max(0,z-floor);
+      z-=Math.min(stamp*cavityDepth,available*.55);
+      heights[i]=Math.max(.006,z);
+      lipMap[i]=Math.round(outerLip*130);
+      rimMap[i]=Math.round(edgeLift*255);
+      shoulderMap[i]=Math.round(ringLift*(isPoly&&face>.002?0:1)*255);
+      faceEdgeMap[i]=Math.round(faceSlope*255);
+      stampMap[i]=Math.round(stamp*255);
+    }
+    // Natural spread: soften the squeezed-out wax (kinks / ghost contours where the layers meet) with a masked blur.
+    // Only pixels that already have wax are averaged (silhouette unchanged), and the stamp walls / rings / engraving are left crisp.
+    {const rB=Math.max(2,Math.round(w/230)),N=w*h,t=new Float32Array(N),c=new Float32Array(N),H2=new Float32Array(N);
+      for(let y=0;y<h;y++){const row=y*w;let sum=0,cnt=0;
+        for(let x=0;x<=rB&&x<w;x++){const v=heights[row+x];if(v>0){sum+=v;cnt++}}
+        for(let x=0;x<w;x++){t[row+x]=sum;c[row+x]=cnt;const xa=x+rB+1,xr=x-rB;if(xa<w){const v=heights[row+xa];if(v>0){sum+=v;cnt++}}if(xr>=0){const v=heights[row+xr];if(v>0){sum-=v;cnt--}}}}
+      for(let x=0;x<w;x++){let sum=0,cnt=0;
+        for(let y=0;y<=rB&&y<h;y++){sum+=t[y*w+x];cnt+=c[y*w+x]}
+        for(let y=0;y<h;y++){H2[y*w+x]=cnt>0?sum/cnt:0;const ya=y+rB+1,yr=y-rB;if(ya<h){sum+=t[ya*w+x];cnt+=c[ya*w+x]}if(yr>=0){sum-=t[yr*w+x];cnt-=c[yr*w+x]}}}
+      for(let i=0;i<N;i++){const z=heights[i];if(z<=0)continue;const keep=clamp((shoulderMap[i]+faceEdgeMap[i]+stampMap[i])/255*3);if(keep>=1)continue;heights[i]=z+(H2[i]-z)*.85*(1-keep)}}
+    // Droplets: small wax blobs splashed around the seal. Slider 0 = none, 100 = about 10 (random size / position, kept inside the canvas and outside the wax).
+    const dropV=safeNum('droplets',0)/100;
+    if(dropV>0){
+      let rs=(state.dropSeed>>>0)||1;const rnd=()=>{rs=(rs+0x6D2B79F5)>>>0;let t=rs;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296};
+      const arD=rot*Math.PI/180,coD=Math.cos(arD),siD=Math.sin(arD),lipWarpD=minSide*(.02+.05*spread)*(.25+1.5*irrW),wrD=softWr;
+      const insideAt=(px,py)=>{const xi=Math.round(px),yi=Math.round(py);if(xi<0||yi<0||xi>=w||yi>=h)return false;if(true)return OUTF[yi*w+xi]>0;const i=yi*w+xi,dx=xi-cx,dy=yi-cy;curAng=Math.atan2(-dx*siD+dy*coD,dx*coD+dy*siD);
+        const o=Math.max(SD(xi+wrD(NF.wa[i]*1.6)*lipWarpD,yi+wrD(NF.wb[i]*1.6)*lipWarpD,cx,cy,lipW,lipH,shape,irr*1.28,rot,state.shapeSeed+31,5),polyS?SD(xi,yi,cx,cy,outerW*minLipK,outerH*minLipK,shape,irr*1.28,rot,state.shapeSeed+31,7):0),b=SD(xi,yi,cx,cy,outerW*kB,outerH*kB,shape,irr*.72,rot,state.shapeSeed+17,8);return Math.max(o,b*.6)>0};
+      const N=Math.max(1,Math.round(dropV*5+(rnd()-.5)*dropV)),drops=[];
+      for(let n=0;n<N;n++){
+        for(let tries=0;tries<30;tries++){
+          const th=rnd()*Math.PI*2,ct=Math.cos(th),st=Math.sin(th);let R=minSide*(.010+.032*Math.pow(rnd(),1.8)),gap=.7+1.5*rnd();
+          let edge=0;for(let r=minSide*.72;r>0;r-=2){if(insideAt(cx+r*ct,cy+r*st)){edge=r;break}}
+          if(edge<=0)continue;
+          let placed=null;
+          for(let s=0;s<8&&!placed;s++){
+            const rc=edge+R*(1+gap),px=cx+rc*ct,py=cy+rc*st;
+            const fits=px>=R*1.2+4&&px<=w-R*1.2-4&&py>=R*1.2+4&&py<=h-R*1.2-4&&R>=minSide*.007;
+            let clear=fits;if(fits)for(let k=0;k<12&&clear;k++){const a=k*Math.PI/6;if(insideAt(px+R*1.4*Math.cos(a),py+R*1.4*Math.sin(a)))clear=false}
+            if(clear&&drops.every(d=>Math.hypot(d.x-px,d.y-py)>(d.R+R)*1.6+4))placed={x:px,y:py,R,p1:rnd()*6.28,p2:rnd()*6.28};
+            else{gap=Math.max(.6,gap*.8);R*=.9}
+          }
+          if(placed){drops.push(placed);break}
+        }
+      }
+      for(const d of drops){
+        const x0=Math.max(0,Math.floor(d.x-d.R*1.4)),x1=Math.min(w-1,Math.ceil(d.x+d.R*1.4)),y0=Math.max(0,Math.floor(d.y-d.R*1.4)),y1=Math.min(h-1,Math.ceil(d.y+d.R*1.4));
+        const hk=.6+.4*Math.min(1,d.R/(minSide*.03));
+        for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++){
+          const dx=x-d.x,dy=y-d.y,a=Math.atan2(dy,dx),Re=d.R*(1+.10*Math.sin(a*2+d.p1)+.06*Math.sin(a*3+d.p2)),t=1-Math.hypot(dx,dy)/Re;
+          if(t<=0)continue;
+          const roll=Math.sqrt(clamp(1-(1-Math.min(1,t/.16))**2)),z=.06*roll+(.035+.07*depth3d)*Math.pow(t,.6)*hk,i=y*w+x;
+          if(z>heights[i]){heights[i]=z;lipMap[i]=Math.round(roll*(1-smooth(t/.6))*110)}
+        }
+      }
+    }
+    setProgress(58);
+    const lightA=-.82,lx=Math.cos(lightA),ly=Math.sin(lightA),gloss=safeNum('gloss',54)/100,rough=safeNum('rough',20)/100;
+    const out=$('canvas');if(!out)throw new Error('미리보기 캔버스를 찾을 수 없습니다.');
+    const workCanvas=document.createElement('canvas');workCanvas.width=w;workCanvas.height=h;
+    const ctx=workCanvas.getContext('2d');if(!ctx)throw new Error('Canvas 2D를 만들 수 없습니다.');
+    const data=ctx.createImageData(w,h),pix=data.data;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const i=y*w+x,z=heights[i];if(z<=0)continue;
+      const left=heights[y*w+Math.max(0,x-1)],right=heights[y*w+Math.min(w-1,x+1)],up=heights[Math.max(0,y-1)*w+x],down=heights[Math.min(h-1,y+1)*w+x];
+      const slopeScale=(6.5+8.5*depth3d)*(w/875);
+      let nx=(left-right)*slopeScale,ny=(up-down)*slopeScale,nz=.30+.70*(1-.35*depth3d),nl=Math.hypot(nx,ny,nz);nx/=nl;ny/=nl;nz/=nl;
+      const diffuse=clamp(.46+nx*lx*.98+ny*ly*.98+nz*.58,.06,1.52),specBase=clamp(nx*lx*.64+ny*ly*.64+nz*.86,0,1),sp=Math.pow(specBase,Math.max(7,24-12*gloss))*gloss*235;
+      const outerLip=lipMap[i]/255,outerRim=rimMap[i]/255,shoulder=shoulderMap[i]/255,faceEdge=faceEdgeMap[i]/255,cavity=stampMap[i]/255;
+      const pi3=Math.min(255,Math.max(0,Math.round(PAT[i]*255)))*3,cr=lut[pi3],cg=lut[pi3+1],cb=lut[pi3+2],fine=NF.fn[i]*rough*5,avg=(left+right+up+down)*.25,curvature=clamp((avg-z)*9*(w/875)*(w/875),-1,1);
+      const rimHighlight=outerLip*(.24+.20*depth3d)+outerRim*(.20+.30*depth3d)+shoulder*(.18+.28*depth3d)+faceEdge*(.06+.10*depth3d);
+      const rimShadow=outerLip*(.10+.10*depth3d)+outerRim*(.16+.18*depth3d)+shoulder*(.12+.18*depth3d);
+      const cavityShadow=cavity*(.26+.34*engrave),ambient=curvature*24;
+      const edgeSpec=Math.pow(clamp(specBase+.08*outerRim,0,1),Math.max(5,18-10*gloss))*gloss*185;
+      const r=cr*diffuse+sp+edgeSpec+255*rimHighlight*.18+ambient+fine-cavityShadow*62-rimShadow*48;
+      const g=cg*diffuse+sp*.98+edgeSpec*.98+255*rimHighlight*.13+ambient+fine-cavityShadow*55-rimShadow*38;
+      const b=cb*diffuse+sp*.95+edgeSpec*.94+255*rimHighlight*.10+ambient+fine-cavityShadow*49-rimShadow*34;
+      const q=i*4;pix[q]=clamp(r,0,255);pix[q+1]=clamp(g,0,255);pix[q+2]=clamp(b,0,255);pix[q+3]=255;
+    }
+    setProgress(84);ctx.putImageData(data,0,0);presentSmooth(workCanvas,out,outW,outH);
+    // Artwork is represented by the masked engraving depth above.
+    // Do not draw the original artwork again after compositing: that second overlay
+    // can escape the wax boundary and is the reason the stamp appeared outside the mold.
+    workCanvas.width=1;workCanvas.height=1;out.classList.remove('hidden');
+    $('status').innerHTML='<b>'+ (isExport?'완료':'미리보기 완료')+'</b> · 입체감 + 압인 + 왁스 영역 고정 · '+outW+'×'+outH+'px';$('sizeText').textContent=outW+' × '+outH+'px';setProgress(100);done?.(true);
+  }catch(err){showError(err);done?.(false)}},isExport?20:10);
+}
+function queueRender(fast){clearTimeout(state.renderTimer);clearTimeout(state.fullTimer);if(fast===true){state.renderTimer=setTimeout(()=>render(false,null,true),30);state.fullTimer=setTimeout(()=>render(false),350)}else state.renderTimer=setTimeout(()=>render(false),70)}
+$('save')?.addEventListener('click',()=>{savePng()});
+$('reset')?.addEventListener('click',()=>{for(const [k,v] of Object.entries(defaults)){const e=$(k);if(e)e.value=v;const n=$(k+'Num');if(n)n.value=v}$('shape').value='circle';updateRect();$('blend').value='marble';updateTwist();$('removeWhite').checked=false;$('checker').checked=true;$('whiteArea').classList.add('hidden');$('workspace').classList.remove('solid');state.colors=['#761d39','#a83456','#d57b63'];paletteUI();state.seed=Math.floor(Math.random()*1e9);state.shapeSeed=Math.floor(Math.random()*1e9);state.dropSeed=Math.floor(Math.random()*1e9);state.mode='line';state.maskCache={alphaKey:'',designKey:'',alpha:null,design:null,box:null};document.querySelectorAll('#mode button').forEach((b,i)=>b.classList.toggle('active',i===0));if(state.image)queueRender()});
+
+// ---- Local settings: saved in this browser (localStorage), restored on load. The image itself is not stored.
+const LS_KEY='swm_settings_v1',LS_TUT='swm_tutorial_done_v1';
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+function saveSettings(){const o={v:1,vals:{},shape:$('shape')?.value,blend:$('blend')?.value,removeWhite:checked('removeWhite'),checker:checked('checker'),mode:state.mode,colors:state.colors,seed:state.seed,shapeSeed:state.shapeSeed,dropSeed:state.dropSeed};for(const k of Object.keys(defaults)){const e=$(k);if(e)o.vals[k]=e.value}lsSet(LS_KEY,JSON.stringify(o))}
+function loadSettings(){let o;try{o=JSON.parse(lsGet(LS_KEY)||'null')}catch(e){o=null}if(!o||typeof o!=='object')return;
+  try{
+    for(const [k,v] of Object.entries(o.vals||{})){const e=$(k);if(!e||!(k in defaults))continue;const n=Number(v);if(!Number.isFinite(n))continue;const val=clamp(n,Number(e.min)||-1e9,Number(e.max)||1e9);e.value=val;const m=$(k+'Num');if(m)m.value=val}
+    const setSel=(id,v)=>{const e=$(id);if(e&&typeof v==='string'&&[...e.options].some(op=>op.value===v))e.value=v};
+    setSel('shape',o.shape);setSel('blend',o.blend);
+    if($('removeWhite')){$('removeWhite').checked=!!o.removeWhite;$('whiteArea')?.classList.toggle('hidden',!o.removeWhite)}
+    if($('checker')&&typeof o.checker==='boolean'){$('checker').checked=o.checker;$('workspace')?.classList.toggle('solid',!o.checker)}
+    if(o.mode==='line'||o.mode==='tone'){state.mode=o.mode;document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('active',b.dataset.v===o.mode))}
+    if(Array.isArray(o.colors)&&o.colors.length>=1&&o.colors.length<=5&&o.colors.every(c=>/^#[0-9a-f]{6}$/i.test(c))){state.colors=o.colors.slice();paletteUI()}
+    for(const k of ['seed','shapeSeed','dropSeed'])if(Number.isFinite(o[k]))state[k]=o[k];
+    updateRect();updateTwist();
+  }catch(e){console.warn('설정 복원 실패',e)}}
+loadSettings();
+{let st=0;const later=()=>{clearTimeout(st);st=setTimeout(saveSettings,250)};['input','change','click'].forEach(ev=>document.addEventListener(ev,later,true))}
+// ---- First-run tutorial overlay (shown once per browser; reopen with the ? button).
+function showTutorial(){
+  if($('tutDim'))return;
+  const steps=[
+    {sel:'#file',t:'1. 이미지 넣기',d:'도장으로 찍을 그림을 선택하세요. 선이 또렷한 그림일수록 잘 나옵니다. 배경이 흰색이면 "배경 제거"를 켜보세요.'},
+    {sel:'#shape',t:'2. 왁스 모양 · 크기',d:'원형, 타원, 사각형, 육각형 등을 고르고 크기·눌려 퍼짐·압인 크기·회전을 조절합니다. 외곽 울렁임과 방울로 자연스러운 느낌을 더할 수 있어요.',up:'.section'},
+    {sel:'#mode',t:'3. 압인 (그림)',d:'그림을 선화 또는 흑백 명암으로 읽어 왁스에 음각으로 눌러 넣습니다. 그림 채움으로 압인 안에서 그림 크기를 정해요.',up:'.section'},
+    {sel:'#palette',t:'4. 왁스 색 · 질감',d:'색을 추가하거나 🎨 랜덤으로 바꾸고, 마블링·결 무늬 같은 혼합 방식과 입체감·광택을 조절하세요. ',up:'.section'},
+    {sel:'#save',t:'5. 저장',d:'상단에서 저장 해상도(px)를 정하고 PNG 저장을 누르세요. 설정은 이 브라우저에 자동 저장되어 다음에도 그대로 유지됩니다. 사용법은 ? 버튼으로 다시 볼 수 있어요.'}
+  ];
+  const dim=document.createElement('div');dim.id='tutDim';dim.className='tut-dim';
+  const card=document.createElement('div');card.className='tut-card';card.setAttribute('role','dialog');
+  document.body.append(dim,card);
+  let i=0,hl=null;
+  const end=()=>{hl?.classList.remove('tut-hl');dim.remove();card.remove();lsSet(LS_TUT,'1');document.removeEventListener('keydown',key,true)};
+  const draw=()=>{
+    hl?.classList.remove('tut-hl');hl=null;const st=steps[i];let el=document.querySelector(st.sel);if(el&&st.up)el=el.closest(st.up)||el;
+    if(el){hl=el;el.classList.add('tut-hl');try{el.scrollIntoView({block:'center',behavior:'smooth'})}catch(e){}}
+    card.innerHTML='<h4></h4><p></p><div class="tut-foot"><span class="tut-step"></span><span style="display:flex;gap:6px"><button class="btn mini" data-a="skip">건너뛰기</button><button class="btn mini" data-a="prev"'+(i?'':' disabled')+'>이전</button><button class="btn primary mini" data-a="next"></button></span></div>';
+    card.querySelector('h4').textContent=st.t;card.querySelector('p').textContent=st.d;card.querySelector('.tut-step').textContent=(i+1)+' / '+steps.length;card.querySelector('[data-a=next]').textContent=i===steps.length-1?'시작하기':'다음';
+  };
+  const go=a=>{if(a==='skip')return end();if(a==='prev'){if(i>0){i--;draw()}return}if(i>=steps.length-1)return end();i++;draw()};
+  card.addEventListener('click',e=>{const a=e.target?.dataset?.a;if(a)go(a)});
+  const key=e=>{if(e.key==='Escape'){e.stopPropagation();end()}else if(e.key==='ArrowRight'||e.key==='Enter'){e.preventDefault();go('next')}else if(e.key==='ArrowLeft')go('prev')};
+  document.addEventListener('keydown',key,true);dim.addEventListener('click',()=>go('next'));
+  draw();
+}
+
+// ---- Theme (dark / light), remembered in this browser.
+const LS_THEME='swm_theme_v1';
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);const b=$('theme');if(b){b.textContent=t==='light'?'☀️':'🌙';b.title=t==='light'?'다크 모드로 전환':'화이트 모드로 전환'}}
+{let t=lsGet(LS_THEME);if(t!=='light'&&t!=='dark')t=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';applyTheme(t);
+ $('theme')?.addEventListener('click',()=>{t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';applyTheme(t);lsSet(LS_THEME,t)})}
+// ---- Per-setting undo (↶) and reset-to-default (↺) buttons.
+{
+  const items=[];let applying=false;
+  const defOf=k=>k==='shape'?'circle':k==='blend'?'marble':defaults[k];
+  const keys=[...Object.keys(defaults),'shape','blend'];
+  for(const k of keys){
+    const el=$(k);if(!el)continue;const field=el.closest('.field')||el.parentElement,lab=field?.querySelector('label')||(el.previousElementSibling&&el.previousElementSibling.tagName==='LABEL'?el.previousElementSibling:null);if(!lab)continue;
+    const box=document.createElement('span');box.className='fbtns';
+    const bu=document.createElement('button'),br=document.createElement('button');
+    bu.type=br.type='button';bu.className=br.className='fb';bu.textContent='↶';br.textContent='↺';bu.title='이전 값으로 되돌리기';br.title='기본값으로 초기화';
+    box.append(bu,br);lab.appendChild(box);
+    const it={k,el,hist:[],last:String(el.value),bu,br};items.push(it);
+    const upd=()=>{bu.disabled=!it.hist.length;br.disabled=String(el.value)===String(defOf(k))};
+    it.upd=upd;
+    const set=v=>{applying=true;try{el.value=v;it.last=String(el.value);el.dispatchEvent(new Event(el.tagName==='SELECT'?'change':'input',{bubbles:true}));if(el.type==='range')el.dispatchEvent(new Event('change',{bubbles:true}))}finally{applying=false}upd()};
+    const commit=()=>{if(applying)return;const v=String(el.value);if(v!==it.last){it.hist.push(it.last);if(it.hist.length>50)it.hist.shift();it.last=v}upd()};
+    el.addEventListener('change',commit);const num=$(k+'Num');num?.addEventListener('change',()=>setTimeout(commit,0));
+    bu.addEventListener('click',()=>{if(it.hist.length)set(it.hist.pop())});
+    br.addEventListener('click',()=>{const d=String(defOf(k));if(String(el.value)!==d){it.hist.push(String(el.value));set(d)}});
+    upd();
+  }
+  window.__swmFieldSync=()=>{for(const it of items){it.hist.length=0;it.last=String(it.el.value);it.upd()}};
+  $('reset')?.addEventListener('click',()=>setTimeout(window.__swmFieldSync,0));
+}
+// ---- PNG save: ask for a file name (and location where the browser supports it).
+function askFileName(def){return new Promise(res=>{
+  const dim=document.createElement('div');dim.className='tut-dim';const card=document.createElement('div');card.className='dlg-card';card.setAttribute('role','dialog');
+  card.innerHTML='<h4>PNG 저장</h4><label>파일 이름</label><input class="select" type="text"><div class="hint">저장 위치는 브라우저의 다운로드 설정을 따릅니다. (위치 선택을 지원하는 브라우저에서는 저장 창이 바로 열립니다.)</div><div class="dlg-foot"><button class="btn mini" data-a="c">취소</button><button class="btn primary mini" data-a="o">저장</button></div>';
+  document.body.append(dim,card);const inp=card.querySelector('input');inp.value=def;inp.focus();inp.setSelectionRange(0,Math.max(0,def.length-4));
+  const done=v=>{dim.remove();card.remove();res(v)};
+  const ok=()=>{let n=inp.value.replace(/[\\/:*?"<>|]/g,'_').trim();if(!n)n=def;if(!/\.png$/i.test(n))n+='.png';done(n)};
+  card.addEventListener('click',e=>{const a=e.target?.dataset?.a;if(a==='o')ok();else if(a==='c')done(null)});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')ok();else if(e.key==='Escape')done(null)});dim.addEventListener('click',()=>done(null));
+})}
+async function savePng(){
+  if(!state.image){alert('먼저 이미지를 선택해주세요.');return}
+  const def='sealing-wax-'+Date.now()+'.png';let handle=null,name=def;
+  if(window.showSaveFilePicker){
+    try{handle=await window.showSaveFilePicker({suggestedName:def,types:[{description:'PNG 이미지',accept:{'image/png':['.png']}}]})}
+    catch(e){if(e&&e.name==='AbortError')return;handle=null}
+  }
+  if(!handle){name=await askFileName(def);if(name==null)return}
+  clearTimeout(state.renderTimer);clearTimeout(state.fullTimer);
+  render(true,ok=>{if(!ok)return;$('canvas').toBlob(async blob=>{
+    if(!blob){showError(new Error('PNG 변환에 실패했습니다.'));return}
+    if(handle){try{const wr=await handle.createWritable();await wr.write(blob);await wr.close();$('status').innerHTML='<b>저장 완료</b> · '+escapeHtml(handle.name||'')}catch(e){showError(e)}return}
+    const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)},'image/png')});
+}
+$('help')?.addEventListener('click',showTutorial);
+if(!lsGet(LS_TUT))setTimeout(showTutorial,400);
+})();
+</script>
+</body>
+</html>
